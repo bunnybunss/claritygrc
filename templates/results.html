@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarityGRC — Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ClarityGRC</a>
+            <a href="/assess" class="btn-secondary">New Assessment</a>
+        </div>
+    </nav>
+
+    <section class="results-hero">
+        <div class="section-container">
+            <h1>Assessment Complete</h1>
+            <p class="section-sub">Compliance picture for <strong>{{ system_type | replace('_', ' ') | title }}</strong>{% if system_name %} — {{ system_name }}{% endif %}</p>
+            {% if assessment_id %}
+            <p class="permalink">Permanent link: <a href="/results/{{ assessment_id }}">/results/{{ assessment_id }}</a></p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="gauge-section">
+        <div class="section-container">
+            <div class="gauge-grid">
+                <div class="gauge-card">
+                    <h3>Compliance Risk Score</h3>
+                    <div class="gauge-wrapper">
+                        <canvas id="gaugeCanvas" width="300" height="170"></canvas>
+                        <div class="gauge-label">
+                            <span class="gauge-score" id="gaugeScore">{{ risk_result.score }}</span>
+                            <span class="gauge-max">/100</span>
+                        </div>
+                    </div>
+                    <div class="gauge-level {{ risk_result.color }}">{{ risk_result.level }} RISK</div>
+                    <p class="gauge-advice">{{ risk_result.advice }}</p>
+                </div>
+                <div class="summary-cards">
+                    <div class="summary-card {{ eu_result.color }}">
+                        <span class="summary-label">EU AI Act</span>
+                        <span class="summary-value">{{ eu_result.classification }}</span>
+                    </div>
+                    <div class="summary-card {{ risk_result.color }}">
+                        <span class="summary-label">Risk Score</span>
+                        <span class="summary-value">{{ risk_result.score }}/100</span>
+                    </div>
+                    <div class="summary-card {{ 'red' if gdpr_result.dpia_required else 'green' }}">
+                        <span class="summary-label">DPIA Required</span>
+                        <span class="summary-value">{{ 'Yes' if gdpr_result.dpia_required else 'No' }}</span>
+                    </div>
+                    <div class="summary-card {{ nis2_result.color }}">
+                        <span class="summary-label">NIS2</span>
+                        <span class="summary-value">{{ nis2_result.classification }}</span>
+                    </div>
+                    <div class="summary-card {{ dora_result.color }}">
+                        <span class="summary-label">DORA</span>
+                        <span class="summary-value">{{ dora_result.classification }}</span>
+                    </div>
+                    <div class="summary-card blue">
+                        <span class="summary-label">ISO Controls</span>
+                        <span class="summary-value">{{ iso_result | length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>EU AI Act Classification</h2>
+                    <span class="badge {{ eu_result.color }}">{{ eu_result.classification }}</span>
+                </div>
+                <p>{{ eu_result.meaning }}</p>
+                <div class="obligations-list">
+                    {% for ob in eu_result.obligations %}
+                    <div class="obligation-item">
+                        <span class="obligation-icon">→</span>
+                        <span>{{ ob }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section alt">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>GDPR Obligations</h2>
+                    {% if gdpr_result.dpia_required %}
+                    <span class="badge red">DPIA Required</span>
+                    {% endif %}
+                </div>
+                <div class="obligations-list">
+                    {% for ob in gdpr_result.obligations %}
+                    <div class="obligation-item">
+                        <span class="obligation-icon">→</span>
+                        <span>{{ ob }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if gdpr_result.articles %}
+                <div class="articles-row">
+                    {% for article in gdpr_result.articles %}
+                    <span class="article-tag">{{ article }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>Risk Score Breakdown</h2>
+                    <span class="badge {{ risk_result.color }}">{{ risk_result.score }}/100</span>
+                </div>
+                <div class="breakdown-list">
+                    {% for item in risk_result.breakdown %}
+                    <div class="breakdown-item {{ 'positive' if '-' in item else 'negative' }}">
+                        {{ item }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section alt">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>ISO 27001 — Recommended Controls</h2>
+                    <span class="badge blue">{{ iso_result | length }} Controls</span>
+                </div>
+                <div class="controls-list">
+                    {% for control in iso_result %}
+                    <div class="control-item">
+                        <div class="control-header">
+                            <span class="control-id">{{ control.id }}</span>
+                            <span class="control-name">{{ control.name }}</span>
+                            <span class="priority-badge {{ control.priority | lower }}">{{ control.priority }}</span>
+                        </div>
+                        <p class="control-desc">{{ control.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>NIS2 Directive</h2>
+                    <span class="badge {{ nis2_result.color }}">{{ nis2_result.classification }}</span>
+                </div>
+                <p>{{ nis2_result.meaning }}</p>
+                {% if nis2_result.sector_note %}
+                <div class="sector-note">
+                    <strong>Sector Note:</strong> {{ nis2_result.sector_note }}
+                </div>
+                {% endif %}
+                {% if nis2_result.obligations %}
+                <div class="obligations-list">
+                    {% for ob in nis2_result.obligations %}
+                    <div class="obligation-item">
+                        <span class="obligation-icon">→</span>
+                        <span>{{ ob }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if nis2_result.deadlines %}
+                <div class="deadlines-box">
+                    <strong>Key Deadlines:</strong>
+                    {% for d in nis2_result.deadlines %}
+                    <div class="deadline-item">{{ d }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if nis2_result.penalties %}
+                <div class="penalty-box">
+                    <strong>Penalties:</strong> {{ nis2_result.penalties }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section alt">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>DORA — Digital Operational Resilience Act</h2>
+                    <span class="badge {{ dora_result.color }}">{{ dora_result.classification }}</span>
+                </div>
+                <p>{{ dora_result.meaning }}</p>
+                {% if dora_result.applicable %}
+                <div class="obligations-list">
+                    {% for ob in dora_result.obligations %}
+                    <div class="obligation-item">
+                        <span class="obligation-icon">→</span>
+                        <span>{{ ob }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if dora_result.key_dates %}
+                <div class="deadlines-box">
+                    <strong>Key Dates:</strong>
+                    {% for d in dora_result.key_dates %}
+                    <div class="deadline-item">{{ d }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if dora_result.regulators %}
+                <div class="deadlines-box">
+                    <strong>Your Regulators:</strong>
+                    {% for r in dora_result.regulators %}
+                    <div class="deadline-item">{{ r }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if dora_result.penalties %}
+                <div class="penalty-box">
+                    <strong>Penalties:</strong> {{ dora_result.penalties }}
+                </div>
+                {% endif %}
+                {% if dora_result.nis2_overlap %}
+                <div class="sector-note">
+                    <strong>NIS2 Overlap:</strong> {{ dora_result.nis2_overlap }}
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>ISO 42001 — AI Management System</h2>
+                    <span class="badge blue">{{ iso42001_result.controls | length }} Controls</span>
+                </div>
+                <p>{{ iso42001_result.meaning }}</p>
+                <div class="sector-note">
+                    <strong>EU AI Act Alignment:</strong> {{ iso42001_result.eu_ai_act_alignment }}
+                </div>
+                <div class="controls-list">
+                    {% for control in iso42001_result.controls %}
+                    <div class="control-item">
+                        <div class="control-header">
+                            <span class="control-id">{{ control.id }}</span>
+                            <span class="control-name">{{ control.name }}</span>
+                            <span class="priority-badge {{ control.priority | lower }}">{{ control.priority }}</span>
+                        </div>
+                        <p class="control-desc">{{ control.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="sector-note" style="margin-top: 1rem;">
+                    <strong>Certification:</strong> {{ iso42001_result.certification_note }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="result-section alt">
+        <div class="section-container">
+            <div class="result-card explainer-card">
+                <div class="result-card-header">
+                    <h2>AI Governance Consultant</h2>
+                </div>
+                <p class="explainer-hint">Get a plain English summary of your results — written like a consultant talking directly to you.</p>
+                <button class="btn-primary" id="explainBtn" onclick="getExplanation()">Explain My Results</button>
+                <div id="explanationBox" class="explanation-box" style="display:none;">
+                    <div id="explanationText"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if history and history | length > 1 %}
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h2>Assessment History — {{ system_name }}</h2>
+                    <span class="badge blue">{{ history | length }} Assessments</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Previous assessments for this system. Click any ID to revisit the full report.</p>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Assessment ID</th>
+                            <th>Date</th>
+                            <th>Risk Score</th>
+                            <th>Risk Level</th>
+                            <th>EU AI Act</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in history %}
+                        <tr>
+                            <td><a href="/results/{{ item.id }}">#{{ item.id }}</a></td>
+                            <td>{{ item.created_at[:10] }}</td>
+                            <td><strong>{{ item.risk_score }}/100</strong></td>
+                            <td>{{ item.risk_level }}</td>
+                            <td>{{ item.eu_classification }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="result-section">
+        <div class="section-container">
+            <div class="result-card download-card">
+                <div class="result-card-header">
+                    <h2>Export Reports</h2>
+                </div>
+                <p>Download a full compliance report or a structured Statement of Applicability for your programme.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.2rem;">
+                    <button class="btn-primary" onclick="downloadReport()">Download PDF Report</button>
+                    <button class="btn-secondary" onclick="downloadSoA()">Download Statement of Applicability</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="section-container">
+            <p>ClarityGRC — Built for educational purposes. Not legal advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        const riskScore = {{ risk_result.score }};
+        const riskColor = "{{ risk_result.color }}";
+        const resultData = {
+            system_name: "{{ system_name if system_name else '' }}",
+            system_type: "{{ system_type }}",
+            description: "{{ description }}",
+            eu_classification: "{{ eu_result.classification }}",
+            eu_meaning: "{{ eu_result.meaning }}",
+            eu_obligations: {{ eu_result.obligations | tojson }},
+            gdpr_obligations: {{ gdpr_result.obligations | tojson }},
+            gdpr_articles: {{ gdpr_result.articles | tojson }},
+            dpia_required: {{ 'true' if gdpr_result.dpia_required else 'false' }},
+            risk_score: {{ risk_result.score }},
+            risk_level: "{{ risk_result.level }}",
+            risk_advice: "{{ risk_result.advice }}",
+            risk_breakdown: {{ risk_result.breakdown | tojson }},
+            iso_controls: {{ iso_result | tojson }},
+            nis2_classification: "{{ nis2_result.classification }}",
+            nis2_meaning: "{{ nis2_result.meaning }}",
+            nis2_obligations: {{ nis2_result.obligations | tojson }},
+            nis2_penalties: "{{ nis2_result.penalties if nis2_result.penalties else '' }}",
+            nis2_sector_note: "{{ nis2_result.sector_note if nis2_result.sector_note else '' }}",
+            dora_classification: "{{ dora_result.classification }}",
+            dora_meaning: "{{ dora_result.meaning }}",
+            dora_obligations: {{ dora_result.obligations | tojson }},
+            dora_penalties: "{{ dora_result.penalties if dora_result.penalties else '' }}",
+            iso42001_controls: {{ iso42001_result.controls | tojson }},
+            iso42001_meaning: "{{ iso42001_result.meaning }}",
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

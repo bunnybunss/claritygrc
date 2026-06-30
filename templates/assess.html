@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarityGRC — Assessment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ClarityGRC</a>
+            <span class="nav-step">Assessment</span>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="assess-section">
+        <div class="assess-container">
+            <form action="/results" method="POST" id="assessForm">
+
+                <div class="step active" id="step1">
+                    <div class="step-header">
+                        <span class="step-tag">Step 1 of 4</span>
+                        <h2>System Basics</h2>
+                        <p>Start with the basics — what does your AI system do and where does it operate?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>System or Project Name</label>
+                        <p class="form-hint">Used to track this assessment over time and group future re-assessments</p>
+                        <input type="text" name="system_name" placeholder="e.g. Hiring Screener v1, Fraud Detection Engine" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What does your AI system do?</label>
+                        <select name="system_type" required>
+                            <option value="" disabled selected>Select a use case</option>
+                            <option value="hiring">Hiring & Recruitment</option>
+                            <option value="credit_scoring">Credit Scoring & Loans</option>
+                            <option value="medical">Medical Diagnosis or Treatment</option>
+                            <option value="education">Education & Student Assessment</option>
+                            <option value="law_enforcement">Law Enforcement</option>
+                            <option value="border_control">Border Control & Immigration</option>
+                            <option value="critical_infrastructure">Critical Infrastructure</option>
+                            <option value="customer_service">Customer Service & Chatbot</option>
+                            <option value="content_recommendation">Content Recommendation</option>
+                            <option value="fraud_detection">Fraud Detection</option>
+                            <option value="realtime_biometric_public">Real-time Biometric ID in Public</option>
+                            <option value="social_scoring">Social Scoring</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Briefly describe what your system does</label>
+                        <textarea name="description" rows="3" placeholder="e.g. Our system screens job applications and ranks candidates based on their CV and online profile..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Where does it operate?</label>
+                        <select name="country">
+                            <option value="netherlands">Netherlands</option>
+                            <option value="france">France</option>
+                            <option value="germany">Germany</option>
+                            <option value="spain">Spain</option>
+                            <option value="eu_other">Other EU Country</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What sector does your organization operate in?</label>
+                        <select name="sector" required>
+                            <option value="" disabled selected>Select your sector</option>
+                            <option value="finance">Financial Services (banking, insurance, investment)</option>
+                            <option value="health">Healthcare</option>
+                            <option value="energy">Energy</option>
+                            <option value="transport">Transport</option>
+                            <option value="digital">Digital Infrastructure / ICT</option>
+                            <option value="public">Public Administration</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What is your organization's size?</label>
+                        <select name="org_size" required>
+                            <option value="" disabled selected>Select size</option>
+                            <option value="small">Small — under 50 employees</option>
+                            <option value="medium">Medium — 50 to 250 employees</option>
+                            <option value="large">Large — over 250 employees</option>
+                        </select>
+                    </div>
+
+                    <div class="step-nav">
+                        <span></span>
+                        <button type="button" class="btn-primary" onclick="nextStep(1)">Next →</button>
+                    </div>
+                </div>
+
+                <div class="step" id="step2">
+                    <div class="step-header">
+                        <span class="step-tag">Step 2 of 4</span>
+                        <h2>Data & Users</h2>
+                        <p>What data does your system process and who does it affect?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What types of data does your system process?</label>
+                        <p class="form-hint">Select all that apply</p>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="personal"> Personal Data (names, emails, IDs)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="biometric"> Biometric Data (fingerprints, face)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="health"> Health & Medical Data
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="financial"> Financial Data
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="children"> Children's Data (under 16)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="location"> Location Data
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="data_types" value="behavioral"> Behavioral Data
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Who are the end users of this system?</label>
+                        <p class="form-hint">Select all that apply</p>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="user_types" value="employees"> Employees
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="user_types" value="customers"> Customers
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="user_types" value="vulnerable"> Vulnerable Groups
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="user_types" value="children"> Children
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="user_types" value="general_public"> General Public
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-secondary" onclick="prevStep(2)">← Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(2)">Next →</button>
+                    </div>
+                </div>
+
+                <div class="step" id="step3">
+                    <div class="step-header">
+                        <span class="step-tag">Step 3 of 4</span>
+                        <h2>Decision Making</h2>
+                        <p>How does your system make decisions and what is the impact?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Does your system make automated decisions that affect people?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="automated_decisions" value="yes" required> Yes
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="automated_decisions" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Can a human override those decisions?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="human_override" value="yes" required> Yes
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="human_override" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What is the impact of a wrong decision by your system?</label>
+                        <select name="decision_impact" required>
+                            <option value="" disabled selected>Select impact level</option>
+                            <option value="low">Low — minor inconvenience</option>
+                            <option value="moderate">Moderate — financial or reputational harm</option>
+                            <option value="serious">Serious — significant harm to individuals</option>
+                            <option value="critical">Critical — risk to life, liberty, or rights</option>
+                        </select>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-secondary" onclick="prevStep(3)">← Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(3)">Next →</button>
+                    </div>
+                </div>
+
+                <div class="step" id="step4">
+                    <div class="step-header">
+                        <span class="step-tag">Step 4 of 4</span>
+                        <h2>Existing Controls</h2>
+                        <p>Tell us what you already have in place — this affects your final score.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Does your organization have an existing information security policy?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="has_security_policy" value="yes" required> Yes
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="has_security_policy" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Does your organization have a Data Protection Officer (DPO)?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="has_dpo" value="yes" required> Yes
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="has_dpo" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Have you previously conducted a risk assessment for this system?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="previous_assessment" value="yes" required> Yes
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="previous_assessment" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-secondary" onclick="prevStep(4)">← Back</button>
+                        <button type="submit" class="btn-primary">Generate Assessment →</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
