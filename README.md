@@ -2,7 +2,7 @@
 
 AI Governance & Compliance Assessment Tool for the European market.
 
-ClarityGRC assesses AI systems against 6 European regulatory frameworks and delivers structured compliance reports — free, instant, built on real frameworks.
+ClarityGRC assesses AI systems against 6 European regulatory frameworks and delivers structured compliance reports free, instant, built on real frameworks.
 
 ## Frameworks Covered
 
