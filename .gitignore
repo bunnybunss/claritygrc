@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+static/reports/
+.env
+claritygrc.db
+*.db
